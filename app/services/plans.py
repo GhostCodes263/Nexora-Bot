@@ -102,6 +102,7 @@ FEATURE_LABELS = {
     "custom_commands": "Custom commands",
     "scheduled_messages": "Scheduled messages",
     "automod_advanced": "Advanced auto-mod (anti-invite/forward/bot/media, anti-spam, slow mode)",
+    "branding": "Custom banner images for your menus",
 }
 LIMIT_LABELS = {
     "filters": "word filters",

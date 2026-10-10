@@ -31,7 +31,7 @@ def _tail(extra: list[str]) -> str:
 @command("games", description="List all games", category=CAT)
 async def games(ctx: Ctx) -> None:
     await ctx.reply("<b>🎮 Games</b>\nBets use the group's virtual currency (no real money).\n" +
-                    "\n".join(f"• /{n} — {d}" for n, d in GAME_LIST))
+                    "\n".join(f"• /{n} — {d}" for n, d in GAME_LIST), banner="games")
 
 
 @command("coinflip", description="Bet on heads or tails", category=CAT, aliases=("cf",),

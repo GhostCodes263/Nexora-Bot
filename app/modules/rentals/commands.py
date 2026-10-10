@@ -30,14 +30,14 @@ async def plans_cmd(ctx: Ctx) -> None:
     if ctx.tenant is None:
         await ctx.reply(text + "\n\nOpen /plans inside your group to subscribe it.")
     else:
-        await ctx.reply(text, markup)
+        await ctx.reply(text, markup, banner="rentals")
 
 
 @command("rent", description="Rent the bot for this group", category=CAT, aliases=("subscribe",),
          permission=Role.ADMIN, scope="group")
 async def rent(ctx: Ctx) -> None:
     text, markup = await _plans_view(ctx)
-    await ctx.reply(text, markup)
+    await ctx.reply(text, markup, banner="rentals")
 
 
 @command("trial", description="Start a free trial of a paid plan", category=CAT, usage="/trial [plan]",

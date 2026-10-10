@@ -3,7 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+import logging
+
 from aiogram import Bot
+from aiogram.exceptions import TelegramAPIError
 from aiogram.types import InlineKeyboardMarkup, Message
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,6 +14,7 @@ from app.bot.registry import CommandSpec
 from app.config.settings import Settings
 from app.database.models import Tenant, User
 from app.repositories import users as users_repo
+from app.services import banners
 from app.services.cache import Cache
 from app.services.roles import Role
 
@@ -49,7 +53,15 @@ class Ctx:
     def in_group(self) -> bool:
         return self.tenant is not None
 
-    async def reply(self, text: str, kb: InlineKeyboardMarkup | None = None) -> Message:
+    async def reply(self, text: str, kb: InlineKeyboardMarkup | None = None, banner: str | None = None) -> Message:
+        """Reply with text, or with a banner image on top when one is set for this screen."""
+        if banner and len(text) <= banners.CAPTION_LIMIT:
+            file_id = await banners.resolve(self.session, self.cache, self.tenant, banner)
+            if file_id:
+                try:
+                    return await self.message.reply_photo(file_id, caption=text, reply_markup=kb)
+                except TelegramAPIError as exc:  # stale file_id etc.: never lose the message itself
+                    logging.getLogger(__name__).warning("banner %s failed: %s", banner, exc)
         return await self.message.reply(text, reply_markup=kb)
 
     async def resolve_target(self) -> tuple[Target | None, list[str]]:

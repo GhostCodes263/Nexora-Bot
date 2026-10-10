@@ -18,7 +18,7 @@ CAT = "owner"
 @command("owner", description="Open the owner panel", category=CAT, permission=Role.OWNER, scope="private")
 async def owner(ctx: Ctx) -> None:
     text, kb = await ui.owner_view(ctx.session, ctx.cache)
-    await ctx.reply(text, kb)
+    await ctx.reply(text, kb, banner="owner")
 
 
 @command("stats", description="Platform statistics", category=CAT, permission=Role.DEVELOPER, scope="private")

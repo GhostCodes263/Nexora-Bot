@@ -1,12 +1,14 @@
 # Command inventory
 
-**278 commands** (aliases not counted).
+**283 commands** (aliases not counted).
 
-## admin (9)
+## admin (14)
 
 | Command | Description | Permission | Aliases | Cooldown |
 |---|---|---|---|---|
 | /auditlog | Recent admin actions in this group | Admin | /audit | 0s |
+| /banners | Show which banners are set | Admin | — | 0s |
+| /delbanner | Remove a banner and fall back to the default | Admin | — | 0s |
 | /demote | Remove someone's staff role in this group | Admin | — | 0s |
 | /disable | Disable a module for this group | Admin | — | 0s |
 | /enable | Enable a module for this group | Admin | — | 0s |
@@ -14,7 +16,10 @@
 | /myrole | Show your role in this chat | User | — | 0s |
 | /prefix | Change this group's command prefix | Admin | — | 0s |
 | /promote | Give someone a staff role in this group | Admin | — | 0s |
+| /setbanner | Set the banner image for a screen (reply to a photo) | Admin | — | 0s |
 | /staff | List roles assigned in this group | Moderator | — | 0s |
+| /theme | Choose this group's menu style | Admin | — | 0s |
+| /uploadbanners | Upload the built-in banner images to Telegram (owner) | Owner | — | 30s |
 
 ## games (25)
 

@@ -37,7 +37,7 @@ async def vip(ctx: Ctx) -> None:
         await ctx.reply("\n".join(lines))
         return
     lines.append("Choose a plan (paid in Telegram Stars). Renewing adds time to what you have left.")
-    await ctx.reply("\n".join(lines), vip_keyboard(cfg))
+    await ctx.reply("\n".join(lines), vip_keyboard(cfg), banner="vip")
 
 
 @command("vipstatus", description="Check your VIP membership", category=CAT, scope="private")

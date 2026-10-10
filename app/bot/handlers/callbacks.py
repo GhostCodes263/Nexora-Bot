@@ -4,15 +4,16 @@ import logging
 
 from aiogram import Bot, Router
 from aiogram.exceptions import TelegramBadRequest
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, InputMediaPhoto
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot import categories, ui
+from app.bot.registry import REGISTRY
 from app.bot.ui import Nav
 from app.config.settings import Settings
 from app.repositories import tenants as tenants_repo
 from app.repositories import users as users_repo
-from app.services import platform
+from app.services import banners, platform
 from app.services import tenants as tenant_service
 from app.services.cache import Cache
 from app.services.permissions import resolve_role
@@ -23,10 +24,21 @@ router = Router(name="callbacks")
 GROUP_TYPES = {"group", "supergroup"}
 
 
-async def _show(cb: CallbackQuery, view: ui.View) -> None:
+async def _show(cb: CallbackQuery, view: ui.View, fid: str | None = None) -> None:
+    """Edit the menu message in place. Photo messages are edited via their caption/media."""
     text, kb = view
+    msg = cb.message
     try:
-        await cb.message.edit_text(text, reply_markup=kb)  # type: ignore[union-attr]
+        if getattr(msg, "photo", None):
+            if len(text) > banners.CAPTION_LIMIT:  # too long for a caption: fall back to a plain message
+                await msg.answer(text, reply_markup=kb)  # type: ignore[union-attr]
+                await msg.delete()  # type: ignore[union-attr]
+            elif fid:
+                await msg.edit_media(InputMediaPhoto(media=fid, caption=text), reply_markup=kb)  # type: ignore[union-attr]
+            else:
+                await msg.edit_caption(caption=text, reply_markup=kb)  # type: ignore[union-attr]
+        else:
+            await msg.edit_text(text, reply_markup=kb)  # type: ignore[union-attr]
     except TelegramBadRequest as exc:
         if "not modified" not in str(exc):
             raise
@@ -57,6 +69,10 @@ async def on_nav(
     role = await resolve_role(session, bot, cache, settings, uid, tenant)
     a, p, n = callback_data.a, callback_data.p, callback_data.n
 
+    async def fid_for(key: str) -> str | None:
+        return await banners.resolve(session, cache, tenant, key)
+
+
     if a == "noop":
         await cb.answer()
     elif a == "close":
@@ -66,16 +82,16 @@ async def on_nav(
         except TelegramBadRequest:
             pass
     elif a == "home":
-        await _show(cb, ui.home_view(role, tenant, in_group))
+        await _show(cb, ui.home_view(role, tenant, in_group), await fid_for("menu"))
         await cb.answer()
     elif a == "searchhelp":
-        await _show(cb, ui.search_help_view())
+        await _show(cb, ui.search_help_view(), await fid_for("help"))
         await cb.answer()
     elif a == "cat":
-        await _show(cb, ui.category_view(p, n, role, tenant, in_group))
+        await _show(cb, ui.category_view(p, n, role, tenant, in_group), await fid_for(p))
         await cb.answer()
     elif a == "cmd":
-        await _show(cb, ui.command_view(p, role, tenant, in_group))
+        await _show(cb, ui.command_view(p, role, tenant, in_group), await fid_for((REGISTRY.get(p).category if REGISTRY.get(p) else "menu")))
         await cb.answer()
     elif a in {"settings", "toggle"}:
         if tenant is None or role < Role.ADMIN:
@@ -90,14 +106,14 @@ async def on_nav(
             await tenants_repo.add_audit(
                 session, "module_toggled", uid, tenant.id, {"module": p, "enabled": new_state}
             )
-        await _show(cb, ui.settings_view(tenant))
+        await _show(cb, ui.settings_view(tenant), await fid_for("settings"))
         await cb.answer()
     elif a in {"owner", "ostats", "ogroups", "maint"}:
         if role < Role.OWNER or in_group:
             await cb.answer("Not allowed.", show_alert=True)
             return
         if a == "owner":
-            await _show(cb, await ui.owner_view(session, cache))
+            await _show(cb, await ui.owner_view(session, cache), await fid_for("owner"))
         elif a == "ostats":
             _, kb = await ui.owner_view(session, cache)
             await _show(cb, (await platform.stats_text(session), kb))
@@ -108,7 +124,7 @@ async def on_nav(
             if p == "yes":
                 await platform.set_maintenance(session, cache, not current)
                 await tenants_repo.add_audit(session, "maintenance", uid, None, {"on": not current})
-                await _show(cb, await ui.owner_view(session, cache))
+                await _show(cb, await ui.owner_view(session, cache), await fid_for("owner"))
             else:
                 await _show(cb, ui.confirm_maintenance_view(current))
         await cb.answer()

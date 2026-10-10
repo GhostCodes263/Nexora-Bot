@@ -74,7 +74,7 @@ async def dating(ctx: Ctx) -> None:
         f"Your profile: <b>{state}</b> · pools joined: {len(pools)}\n\n"
         "1. /dsetup in private chat to build your profile\n2. /djoin inside a group that enabled dating\n"
         "3. /discover to browse people from your pools\n4. mutual likes become matches; matches can /propose\n\n"
-        "Privacy: /dhide, /doptout, /dprivacy, /dblock, /dreport, /ddelete")
+        "Privacy: /dhide, /doptout, /dprivacy, /dblock, /dreport, /ddelete", banner="dating")
 
 
 @command("dsetup", description="Create or update your dating profile", category=CAT, scope="private", **OFF)

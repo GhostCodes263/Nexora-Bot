@@ -16,6 +16,7 @@ from app.services import platform
 from app.services import tenants as tenant_service
 from app.services.cache import Cache
 from app.services.roles import Role
+from app.services.style import header, theme_of
 
 PAGE = 8
 View = tuple[str, InlineKeyboardMarkup]
@@ -75,8 +76,8 @@ def home_view(role: Role, tenant: Tenant | None, in_group: bool) -> View:
         rows.append(extra)
     rows.append([("🔎 Search help", Nav(a="searchhelp")), CLOSE])
     text = (
-        "<b>🤖 Main menu</b>\n\nPick a category below.\n"
-        "Tip: <code>/help ban</code> searches every command."
+        f"{header(theme_of(tenant), '🏠', 'Main menu')}\n\nPick a category below.\n"
+        "<i>Tip: /help ban searches every command.</i>"
     )
     return text, _kb(rows)
 
@@ -107,7 +108,7 @@ def category_view(category: str, page: int, role: Role, tenant: Tenant | None, i
             nav.append(("▶️", Nav(a="cat", p=category, n=page + 1)))
         rows.append(nav)
     rows.append([("⬅️ Back", Nav(a="home")), HOME])
-    return f"<b>{emoji} {title}</b> · {len(specs)} commands", _kb(rows)
+    return f"{header(theme_of(tenant), emoji, title)}\n{len(specs)} commands", _kb(rows)
 
 
 def command_view(name: str, role: Role, tenant: Tenant | None, in_group: bool) -> View:
@@ -149,7 +150,7 @@ def settings_view(tenant: Tenant) -> View:
         rows.append([(f"{'✅' if on else '❌'} {emoji} {title}", Nav(a="toggle", p=key))])
     rows.append([HOME, CLOSE])
     text = (
-        f"<b>⚙️ Settings</b> · {escape(tenant.title or 'this chat')}\n\n"
+        f"{header(theme_of(tenant), '⚙️', 'Settings')}\n{escape(tenant.title or 'this chat')}\n\n"
         f"Command prefix: <code>{escape(tenant.prefix)}</code>  (change with <code>/prefix</code>)\n"
         "Tap a module to switch it on or off for this group."
     )
@@ -163,7 +164,7 @@ async def owner_view(session: AsyncSession, cache: Cache) -> View:
         [(f"🛠 Maintenance: {'ON' if maint else 'OFF'}", Nav(a="maint", p="ask"))],
         [HOME, CLOSE],
     ]
-    return "<b>👑 Owner panel</b>\nPlatform controls.", _kb(rows)
+    return f"{header(theme_of(None), '👑', 'Owner panel')}\nPlatform controls.", _kb(rows)
 
 
 async def owner_groups_view(session: AsyncSession, page: int) -> View:

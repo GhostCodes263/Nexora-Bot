@@ -15,13 +15,13 @@ async def start(ctx: Ctx) -> None:
         await ctx.reply("👋 I'm here! Use /menu for buttons or /help to browse commands.")
         return
     text, kb = ui.home_view(ctx.role, None, False)
-    await ctx.reply(f"👋 <b>Welcome, {ctx.user.first_name or 'friend'}!</b>\n\n{text}", kb)
+    await ctx.reply(f"👋 <b>Welcome, {ctx.user.first_name or 'friend'}!</b>\n\n{text}", kb, banner="welcome")
 
 
 @command("menu", description="Open the interactive menu", category=CAT, aliases=("home",))
 async def menu(ctx: Ctx) -> None:
     text, kb = ui.home_view(ctx.role, ctx.tenant, ctx.in_group)
-    await ctx.reply(text, kb)
+    await ctx.reply(text, kb, banner="menu")
 
 
 @command(
@@ -44,7 +44,7 @@ async def help_cmd(ctx: Ctx) -> None:
             text, kb = ui.command_view(spec.name, ctx.role, ctx.tenant, ctx.in_group)
         else:
             text, kb = ui.search_view(query, ctx.role, ctx.tenant, ctx.in_group)
-    await ctx.reply(text, kb)
+    await ctx.reply(text, kb, banner="help")
 
 
 @command(
@@ -54,7 +54,7 @@ async def help_cmd(ctx: Ctx) -> None:
 async def settings_cmd(ctx: Ctx) -> None:
     assert ctx.tenant is not None
     text, kb = ui.settings_view(ctx.tenant)
-    await ctx.reply(text, kb)
+    await ctx.reply(text, kb, banner="settings")
 
 
 @command("about", description="About this bot", category=CAT)
