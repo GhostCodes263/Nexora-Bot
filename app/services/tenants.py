@@ -19,4 +19,6 @@ def is_enabled(tenant: Tenant | None, spec: CommandSpec) -> bool:
 
 def module_enabled(tenant: Tenant, category: str) -> bool:
     override = (tenant.module_overrides or {}).get(category)
-    return True if override is None else bool(override)
+    if override is None:
+        return category not in categories.DEFAULT_OFF
+    return bool(override)

@@ -414,3 +414,99 @@ class LotteryTicket(Base):
     tenant_id: Mapped[int] = mapped_column(_fk_tenant())
     user_id: Mapped[int] = mapped_column(BigInteger)
     tickets: Mapped[int] = mapped_column(Integer, default=0)
+
+
+# =============================== Phase 3b: dating / social ====================================
+
+class DatingProfile(Base):
+    """Opt-in, 18+ only. One profile per person; visible only inside pools (groups) they chose to join."""
+
+    __tablename__ = "tp_dating_profiles"
+
+    user_id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=False)
+    name: Mapped[str] = mapped_column(String(60))
+    age: Mapped[int] = mapped_column(Integer)
+    gender: Mapped[str] = mapped_column(String(30), default="")
+    location: Mapped[str] = mapped_column(String(60), default="")  # country/city level only
+    interests: Mapped[str] = mapped_column(String(200), default="")
+    bio: Mapped[str] = mapped_column(String(500), default="")
+    looking_for: Mapped[str] = mapped_column(String(100), default="")
+    rel_status: Mapped[str] = mapped_column(String(30), default="")
+    photo_file_id: Mapped[str | None] = mapped_column(String(256))
+    hidden: Mapped[bool] = mapped_column(Boolean, default=False)
+    opted_out: Mapped[bool] = mapped_column(Boolean, default=False)
+    share_contact: Mapped[bool] = mapped_column(Boolean, default=True)
+    pref_gender: Mapped[str] = mapped_column(String(16), default="any")
+    pref_min_age: Mapped[int] = mapped_column(Integer, default=18)
+    pref_max_age: Mapped[int] = mapped_column(Integer, default=99)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class DatingPool(Base):
+    __tablename__ = "tp_dating_pool"
+    __table_args__ = (UniqueConstraint("tenant_id", "user_id", name="uq_tp_dating_pool"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    tenant_id: Mapped[int] = mapped_column(_fk_tenant())
+    user_id: Mapped[int] = mapped_column(BigInteger)
+
+
+class DatingSwipe(Base):
+    __tablename__ = "tp_dating_swipes"
+    __table_args__ = (
+        UniqueConstraint("tenant_id", "from_id", "to_id", name="uq_tp_dating_swipe"),
+        Index("ix_tp_dating_swipes_to", "tenant_id", "to_id"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    tenant_id: Mapped[int] = mapped_column(_fk_tenant())
+    from_id: Mapped[int] = mapped_column(BigInteger)
+    to_id: Mapped[int] = mapped_column(BigInteger)
+    kind: Mapped[str] = mapped_column(String(8))  # like | dislike | crush
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class DatingMatch(Base):
+    __tablename__ = "tp_dating_matches"
+    __table_args__ = (UniqueConstraint("tenant_id", "user_a", "user_b", name="uq_tp_dating_match"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    tenant_id: Mapped[int] = mapped_column(_fk_tenant())
+    user_a: Mapped[int] = mapped_column(BigInteger)  # always the smaller id
+    user_b: Mapped[int] = mapped_column(BigInteger)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class DatingBlock(Base):
+    __tablename__ = "tp_dating_blocks"
+    __table_args__ = (UniqueConstraint("user_id", "blocked_id", name="uq_tp_dating_block"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(BigInteger)
+    blocked_id: Mapped[int] = mapped_column(BigInteger)
+
+
+class DatingReport(Base):
+    __tablename__ = "tp_dating_reports"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    reporter_id: Mapped[int] = mapped_column(BigInteger)
+    reported_id: Mapped[int] = mapped_column(BigInteger, index=True)
+    tenant_id: Mapped[int | None] = mapped_column(ForeignKey("tp_tenants.id", ondelete="SET NULL"))
+    reason: Mapped[str] = mapped_column(String(200), default="")
+    status: Mapped[str] = mapped_column(String(12), default="open")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class Couple(Base):
+    __tablename__ = "tp_couples"
+    __table_args__ = (UniqueConstraint("tenant_id", "user_a", "user_b", name="uq_tp_couple"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    tenant_id: Mapped[int] = mapped_column(_fk_tenant())
+    user_a: Mapped[int] = mapped_column(BigInteger)
+    user_b: Mapped[int] = mapped_column(BigInteger)
+    since: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    xp: Mapped[int] = mapped_column(BigInteger, default=0)
+    last_activity: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

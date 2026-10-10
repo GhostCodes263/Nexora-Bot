@@ -1,7 +1,7 @@
 # Telegram Bot Platform
 
 Multi-tenant Telegram bot (aiogram 3, PostgreSQL, Redis, SQLAlchemy 2, Alembic) to rent out to other
-groups and to run your own public + VIP community. **Status: Phases 1, 2 and 3a done (242 commands).**
+groups and to run your own public + VIP community. **Status: Phases 1, 2, 3a and dating done (278 commands).**
 The exact command list is in `COMMANDS.md` (generated).
 
 ## What exists now
@@ -45,13 +45,25 @@ Redis with memory fallback.
 - Games waiting on a button (blackjack, cups, high-low) keep your bet in escrow; if you never finish, it is lost
   after about 10 minutes.
 
-## Not built yet (Phase 3b)
-Dating/social, AI (Gemini/OpenAI with limits), analytics dashboards, customer dashboard, channel tools,
-media tools. Nothing is stubbed; unbuilt features simply have no commands.
+**Phase 3b – dating / social (36 commands)**
+- **Adults only, opt-in, private.** Profiles are built in a private chat (`/dsetup`); anyone under 18 is turned away
+  and nothing is saved. Location is asked at country/city level only.
+- **Pools keep groups separate.** A profile is only visible to people who joined the *same group's* dating pool
+  (`/djoin` inside a group that switched dating on). Someone in another group can never see you.
+- Discover with buttons (like / pass / crush / block / report), mutual matches, compatibility scores,
+  preferences (gender, age range), anonymous crushes, proposals, couples with couple XP, date nights,
+  achievements, breakups and match statistics.
+- **Privacy controls:** `/dhide`, `/doptout`, `/dprivacy contact off`, `/dblock`, `/dreport`, and `/ddelete confirm`
+  which erases everything (reports filed *against* a person are kept for safety). `/deletemydata` also wipes it.
+- Dating is **off by default** in rented groups: an admin must run `/enable dating`.
+
+## Not built yet
+AI (Gemini/OpenAI with limits), analytics dashboards, customer dashboard, channel tools, media tools.
+Nothing is stubbed; unbuilt features simply have no commands.
 
 ## Updating an existing deployment
 Replace/upload the new files in your GitHub repo and commit. Render redeploys and the new migration
-(`0002`, `0003`) create the new tables automatically and update the plans (shop = paid feature, daily game cap).
+(`0002`-`0004`) create the new tables automatically and update the plans (shop = paid feature, daily game cap).
 
 ## Setting things up after deploy
 1. **Payments:** nothing to configure. Stars invoices need no provider token. Prices are in the `tp_plans`
@@ -91,7 +103,7 @@ the automatic fallback when no public URL exists.
 ## Tests and CI
 `pytest` covers users, tenant isolation, roles, registry, cooldowns/rate limits, Redis outage fallback,
 moderation thresholds, economy transactions, tenant isolation of balances, interest, trades/items,
-achievements, game rules, trials, rentals, grace/expiry, plan switching, payment idempotency and refunds,
+achievements, game rules, dating pools/matches/privacy, trials, rentals, grace/expiry, plan switching, payment idempotency and refunds,
 checkout validation, verification workflow, reviewer isolation, VIP expiry and eligibility.
 GitHub Actions runs them on every push (Actions tab).
 > The tests were written but never executed by me (no network to install packages in the build
@@ -113,5 +125,5 @@ app/bot/               registry, dispatcher handlers, menus, middleware
 app/modules/*/         commands grouped by module
 app/services/          roles, permissions, plans, billing, payments, vip, scheduler, cache
 app/repositories/      database access (tenant-scoped)
-alembic/versions/      0001 core, 0002 phase 2, 0003 economy/games (tables are prefixed tp_)
+alembic/versions/      0001 core, 0002 phase 2, 0003 economy/games, 0004 dating (tables are prefixed tp_)
 ```

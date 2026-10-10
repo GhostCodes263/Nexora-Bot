@@ -1,6 +1,6 @@
 # Command inventory
 
-**242 commands** (aliases not counted).
+**278 commands** (aliases not counted).
 
 ## admin (9)
 
@@ -57,6 +57,47 @@
 | /privacy | What data the bot stores about you | User | — | 0s |
 | /settings | Open this group's settings | Admin | — | 0s |
 | /start | Start the bot and open the menu | User | — | 0s |
+
+## dating (36)
+
+| Command | Description | Permission | Aliases | Cooldown |
+|---|---|---|---|---|
+| /breakup | End your couple | User | — | 0s |
+| /cancelsetup | Stop filling in your dating profile | User | — | 0s |
+| /compat | Compatibility score with someone | User | — | 3s |
+| /couple | Show your couple card | User | — | 0s |
+| /coupleachievements | Achievements your couple unlocked | User | — | 0s |
+| /couplexp | Your couple's XP and level | User | — | 0s |
+| /crush | Send an anonymous crush | User | — | 5s |
+| /daccept | Accept your pending couple proposal | User | — | 0s |
+| /datenight | Do a date night for couple XP (every 12 hours) | User | — | 0s |
+| /dating | How dating works and your status | User | — | 0s |
+| /dblock | Block someone (they can't see you either) | User | — | 0s |
+| /dblocked | List people you blocked | User | — | 0s |
+| /ddelete | Delete your dating profile and all dating data | User | — | 0s |
+| /dhide | Hide your profile from discovery (keeps matches) | User | — | 0s |
+| /discover | Browse profiles from your pools | User | — | 2s |
+| /dislike | Pass on someone | User | — | 0s |
+| /djoin | Join this group's dating pool | User | — | 0s |
+| /dleave | Leave this group's dating pool | User | — | 0s |
+| /doptin | Opt back in to matching | User | — | 0s |
+| /doptout | Opt out of matching entirely | User | — | 0s |
+| /dpool | List the dating pools you joined | User | — | 0s |
+| /dpref | Set who you want to see (gender and age range) | User | — | 0s |
+| /dprivacy | Choose whether matches get a link to message you | User | — | 0s |
+| /dreject | Decline your pending couple proposal | User | — | 0s |
+| /dreport | Report a dating profile to the moderators | User | — | 10s |
+| /dreports | Open dating reports grouped by person | Super Admin | — | 0s |
+| /dresolve | Mark reports about a person as handled | Super Admin | — | 0s |
+| /dsetup | Create or update your dating profile | User | — | 0s |
+| /dshow | Make your profile visible again | User | — | 0s |
+| /dstats | Your match statistics | User | — | 0s |
+| /dunblock | Unblock someone | User | — | 0s |
+| /like | Like someone in a shared pool | User | — | 0s |
+| /matches | Your mutual matches | User | — | 0s |
+| /myprofile | Show your own dating profile | User | — | 0s |
+| /profile | View a profile from a pool you share | User | — | 0s |
+| /propose | Propose to become a couple with a match | User | — | 30s |
 
 ## economy (31)
 

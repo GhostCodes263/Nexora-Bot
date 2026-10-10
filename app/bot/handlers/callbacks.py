@@ -13,6 +13,7 @@ from app.config.settings import Settings
 from app.repositories import tenants as tenants_repo
 from app.repositories import users as users_repo
 from app.services import platform
+from app.services import tenants as tenant_service
 from app.services.cache import Cache
 from app.services.permissions import resolve_role
 from app.services.roles import Role
@@ -84,7 +85,7 @@ async def on_nav(
             if p not in categories.toggleable():
                 await cb.answer("That module can't be toggled.", show_alert=True)
                 return
-            new_state = not bool((tenant.module_overrides or {}).get(p, True))
+            new_state = not tenant_service.module_enabled(tenant, p)
             tenants_repo.set_module(tenant, p, new_state)
             await tenants_repo.add_audit(
                 session, "module_toggled", uid, tenant.id, {"module": p, "enabled": new_state}
@@ -134,4 +135,7 @@ async def _forget(session: AsyncSession, user_id: int) -> None:
         user.first_name = ""
     await session.execute(delete(TenantRole).where(TenantRole.user_id == user_id))
     await session.execute(delete(VerificationApplication).where(VerificationApplication.user_id == user_id))
+    from app.repositories import dating as dating_repo
+
+    await dating_repo.delete_all(session, user_id)
     await tenants_repo.add_audit(session, "user_data_cleared", user_id, None, {})

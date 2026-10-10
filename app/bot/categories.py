@@ -11,6 +11,7 @@ CATEGORIES: dict[str, tuple[str, str, bool]] = {
     "entertainment": ("🎉", "Entertainment", True),
     "utility": ("🧰", "Utilities", True),
     "rentals": ("💎", "Plans & rentals", False),
+    "dating": ("❤️", "Dating", True),
     "verification": ("✅", "Verification", False),
     "vip": ("💠", "VIP", False),
     "payments": ("💳", "Payments", False),
@@ -29,3 +30,7 @@ def toggleable() -> list[str]:
 
 def order_key(category: str) -> int:
     return ORDER.index(category) if category in ORDER else len(ORDER)
+
+
+# Modules a rented group must switch on itself.
+DEFAULT_OFF = {"dating"}

@@ -11,6 +11,7 @@ from app.bot.handlers import (
     callbacks,
     chat_events,
     commands,
+    dating,
     errors,
     group_events,
     payments,
@@ -36,7 +37,7 @@ def build_dispatcher(settings: Settings, cache: Cache) -> Dispatcher:
     # generic command dispatcher; keyword/join handlers run last.
     for router in (
         automod.router, xp.router, payments.router, chat_events.router, billing.router, vip.router,
-        verification.router, play.router, callbacks.router, commands.router, group_events.router,
+        verification.router, dating.router, play.router, callbacks.router, commands.router, group_events.router,
     ):
         dp.include_router(router)
     dp.errors.register(errors.on_error)
