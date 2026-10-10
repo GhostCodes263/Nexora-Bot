@@ -1,0 +1,39 @@
+# Render Blueprint: New + > Blueprint > pick your GitHub repo.
+# You will be asked for BOT_TOKEN and OWNER_ID. Everything else is wired automatically.
+services:
+  - type: web
+    name: tgplatform-bot
+    runtime: docker
+    plan: starter
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: OWNER_ID
+        sync: false
+      - key: ENVIRONMENT
+        value: production
+      - key: LOG_LEVEL
+        value: INFO
+      - key: WEBHOOK_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: tgplatform-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: tgplatform-redis
+          property: connectionString
+
+  - type: keyvalue
+    name: tgplatform-redis
+    plan: free
+    maxmemoryPolicy: allkeys-lru
+    ipAllowList: []
+
+databases:
+  - name: tgplatform-db
+    plan: basic-256mb
